@@ -7,8 +7,9 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 const DISCORD_TOKEN = config.discord_bot_token;
 const CHANNEL_ID = "1067460388167352380";
+const GUILD_ID = "819348511090016257";
 
-client.once("ready", () => {
+client.once("ready", async () => {
   console.log(`Logged in as ${client.user.tag}`);
 });
 
@@ -22,7 +23,7 @@ exports.triggerDiscordBot = functions.https.onRequest(async (req, res) => {
 
     // Send a message or trigger a /command
     if (logsChannel) {
-      await logsChannel.send({ content: "GCBC Coach Tracker Updated Sheet", ephemeral: true });
+      await logsChannel.send({ content: "schedule-sync: GCBC Coach Tracker Updated Sheet" });
       res.status(200).send("Message sent successfully.");
     } else {
       res.status(404).send("A problem occured");
@@ -30,25 +31,5 @@ exports.triggerDiscordBot = functions.https.onRequest(async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("Error occurred.");
-  }
-});
-
-exports.scheduledTask = functions.pubsub.schedule("every 24 hours").onRun(async (context) => {
-  try {
-    // Find the Discord channel or user you want to send a message to
-    const targetChannel = client.channels.cache.get(CHANNEL_ID);
-
-    // Send the /command or message
-    if (targetChannel) {
-      await targetChannel.send({
-        content: "Hello from Firebase! This is your daily message.",
-        ephemeral: true,
-      });
-      console.log("Command sent.");
-    } else {
-      console.error("Channel not found.");
-    }
-  } catch (error) {
-    console.error(error);
   }
 });
